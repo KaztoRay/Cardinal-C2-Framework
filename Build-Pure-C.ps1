@@ -1,4 +1,4 @@
-# Moonlight C2 Framework - 순수 C 빌드 스크립트
+# Cardinal C2 Framework - 순수 C 빌드 스크립트
 # 어셈블리 제거, GUI 서버 추가
 
 param(
@@ -13,7 +13,7 @@ param(
 $ErrorActionPreference = "Continue"
 
 Write-Host "`n============================================" -ForegroundColor Cyan
-Write-Host " Moonlight C2 Framework - Pure C Build" -ForegroundColor Green
+Write-Host " Cardinal C2 Framework - Pure C Build" -ForegroundColor Green
 Write-Host "============================================`n" -ForegroundColor Cyan
 
 # 빌드 디렉토리 생성
@@ -67,13 +67,13 @@ if ($Client) {
     # 링크
     Write-Host "  [+] Linking..." -ForegroundColor Gray
     gcc build/implant.o build/stealth.o build/network.o `
-        -o build/moonlight-implant.exe `
+        -o build/Cardinal-implant.exe `
         -lws2_32 -ladvapi32 -luser32 -s -O2
     
     if ($LASTEXITCODE -eq 0) {
-        Copy-Item "build\moonlight-implant.exe" "..\bin\" -Force
+        Copy-Item "build\Cardinal-implant.exe" "..\bin\" -Force
         Write-Host "[+] Client build successful!" -ForegroundColor Green
-        $size = (Get-Item "..\bin\moonlight-implant.exe").Length / 1KB
+        $size = (Get-Item "..\bin\Cardinal-implant.exe").Length / 1KB
         Write-Host "    Size: $([math]::Round($size, 2)) KB`n" -ForegroundColor Gray
     } else {
         Write-Host "[!] Client build failed" -ForegroundColor Red
@@ -95,12 +95,12 @@ if ($Server) {
     
     Push-Location server
     
-    gcc main.c -o build\moonlight-server.exe -lws2_32 -s -O2
+    gcc main.c -o build\Cardinal-server.exe -lws2_32 -s -O2
     
     if ($LASTEXITCODE -eq 0) {
-        Copy-Item "build\moonlight-server.exe" "..\bin\" -Force
+        Copy-Item "build\Cardinal-server.exe" "..\bin\" -Force
         Write-Host "[+] Console Server build successful!" -ForegroundColor Green
-        $size = (Get-Item "..\bin\moonlight-server.exe").Length / 1KB
+        $size = (Get-Item "..\bin\Cardinal-server.exe").Length / 1KB
         Write-Host "    Size: $([math]::Round($size, 2)) KB`n" -ForegroundColor Gray
     } else {
         Write-Host "[!] Console Server build failed" -ForegroundColor Red
@@ -131,14 +131,14 @@ if ($GUIServer) {
     # 링크 (Windows GUI 모드)
     Write-Host "  [+] Linking GUI server..." -ForegroundColor Gray
     gcc build/gui_server.o build/gui_server_functions.o build/server_backend.o `
-        -o build/moonlight-gui-server.exe `
+        -o build/Cardinal-gui-server.exe `
         -lws2_32 -lcomctl32 -lgdi32 -luser32 -lcomdlg32 `
         -mwindows -s -O2
     
     if ($LASTEXITCODE -eq 0) {
-        Copy-Item "build\moonlight-gui-server.exe" "..\bin\" -Force
+        Copy-Item "build\Cardinal-gui-server.exe" "..\bin\" -Force
         Write-Host "[+] GUI Server build successful!" -ForegroundColor Green
-        $size = (Get-Item "..\bin\moonlight-gui-server.exe").Length / 1KB
+        $size = (Get-Item "..\bin\Cardinal-gui-server.exe").Length / 1KB
         Write-Host "    Size: $([math]::Round($size, 2)) KB`n" -ForegroundColor Gray
     } else {
         Write-Host "[!] GUI Server build failed" -ForegroundColor Red

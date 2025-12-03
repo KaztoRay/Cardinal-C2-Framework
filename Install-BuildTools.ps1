@@ -1,8 +1,8 @@
-# Moonlight C2 Framework - Build Tools Installer
+# Cardinal C2 Framework - Build Tools Installer
 # This script downloads and installs MinGW-w64 and NASM
 
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "Moonlight C2 Framework - Build Tools Setup" -ForegroundColor Cyan
+Write-Host "Cardinal C2 Framework - Build Tools Setup" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 

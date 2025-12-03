@@ -19,7 +19,7 @@ git remote add origin https://github.com/KaztoRay/MoonLignt-C2-Framework.git
 git branch -M master
 
 # Create log file
-"# Moonlight C2 Development History`n`n" | Set-Content log.txt
+"# Cardinal C2 Development History`n`n" | Set-Content log.txt
 
 $n = 0
 for ($d = $S; $d -le $E; $d = $d.AddDays(1)) {

@@ -1,4 +1,4 @@
-# Moonlight C2 - Robust Commit Generator
+# Cardinal C2 - Robust Commit Generator
 # 2013-02-08 to 2016-12-31, 10 commits/day
 
 $START = Get-Date "2013-02-08"
@@ -20,7 +20,7 @@ $msgs = @(
     "Build system", "Bug fixes"
 )
 
-Write-Host "`n[*] Moonlight C2 - Complete History Generator`n" -ForegroundColor Cyan
+Write-Host "`n[*] Cardinal C2 - Complete History Generator`n" -ForegroundColor Cyan
 
 # Setup
 $hist = "HISTORY.log"

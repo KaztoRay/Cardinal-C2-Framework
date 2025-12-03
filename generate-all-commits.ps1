@@ -1,4 +1,4 @@
-# Moonlight C2 - Complete History Generator
+# Cardinal C2 - Complete History Generator
 # Creates commits from 2013-02-08 to 2016-12-31 (10 per day)
 
 $ErrorActionPreference = "Stop"
@@ -8,7 +8,7 @@ $START_DATE = Get-Date "2013-02-08"
 $END_DATE = Get-Date "2016-12-31"
 $COMMITS_PER_DAY = 10
 
-Write-Host "`n=== Moonlight C2 Historical Commit Generator ===" -ForegroundColor Cyan
+Write-Host "`n=== Cardinal C2 Historical Commit Generator ===" -ForegroundColor Cyan
 Write-Host "Creating commits from $($START_DATE.ToString('yyyy-MM-dd')) to $($END_DATE.ToString('yyyy-MM-dd'))" -ForegroundColor White
 Write-Host "Commits per day: $COMMITS_PER_DAY`n" -ForegroundColor White
 
@@ -68,7 +68,7 @@ $messages = @(
 
 # Initialize history file
 $historyFile = "DEVELOPMENT_HISTORY.md"
-Set-Content -Path $historyFile -Value "# Moonlight C2 Framework - Development History`n`n"
+Set-Content -Path $historyFile -Value "# Cardinal C2 Framework - Development History`n`n"
 
 # Add initial files
 git add -A

@@ -1,6 +1,6 @@
 @echo off
 echo ============================================
-echo Moonlight C2 Framework - Simple Build
+echo Cardinal C2 Framework - Simple Build
 echo ============================================
 echo.
 
@@ -74,7 +74,7 @@ gcc -c monitoring_control.c -o build\obj\monitoring_control.o -Wall -O2
 if %ERRORLEVEL% NEQ 0 goto error
 
 echo [*] Linking client...
-gcc -o build\moonlight-implant-enhanced.exe build\obj\implant_enhanced.o build\obj\monitoring_control.o build\obj\stealth.obj build\obj\syscalls.obj build\obj\network_asm.obj build\obj\monitoring.obj build\obj\control.obj -lws2_32 -ladvapi32 -lgdi32 -luser32 -s
+gcc -o build\Cardinal-implant-enhanced.exe build\obj\implant_enhanced.o build\obj\monitoring_control.o build\obj\stealth.obj build\obj\syscalls.obj build\obj\network_asm.obj build\obj\monitoring.obj build\obj\control.obj -lws2_32 -ladvapi32 -lgdi32 -luser32 -s
 if %ERRORLEVEL% NEQ 0 goto error
 
 echo [+] Client built successfully!
@@ -100,7 +100,7 @@ gcc -c main_enhanced.c -o build\obj\main_enhanced.o -Wall -O2 -DMAX_CLIENTS=100
 if %ERRORLEVEL% NEQ 0 goto error
 
 echo [*] Linking server...
-gcc -o build\moonlight-server-enhanced.exe build\obj\main_enhanced.o build\obj\network_asm.obj -lws2_32 -lpthread -s
+gcc -o build\Cardinal-server-enhanced.exe build\obj\main_enhanced.o build\obj\network_asm.obj -lws2_32 -lpthread -s
 if %ERRORLEVEL% NEQ 0 goto error
 
 echo [+] Server built successfully!
@@ -116,7 +116,7 @@ echo.
 cd gui
 
 echo [*] Compiling GUI...
-gcc -Wall -O2 -DWIN32 -D_WIN32_WINNT=0x0501 -mwindows main.c -o MoonlightC2-GUI.exe -lcomctl32 -lws2_32 -lgdi32 -lcomdlg32 -s
+gcc -Wall -O2 -DWIN32 -D_WIN32_WINNT=0x0501 -mwindows main.c -o CardinalC2-GUI.exe -lcomctl32 -lws2_32 -lgdi32 -lcomdlg32 -s
 if %ERRORLEVEL% NEQ 0 goto error
 
 echo [+] GUI built successfully!
@@ -132,9 +132,9 @@ echo.
 if not exist bin mkdir bin
 if not exist bin\exploits mkdir bin\exploits
 
-copy client\build\moonlight-implant-enhanced.exe bin\
-copy server\build\moonlight-server-enhanced.exe bin\
-copy gui\MoonlightC2-GUI.exe bin\
+copy client\build\Cardinal-implant-enhanced.exe bin\
+copy server\build\Cardinal-server-enhanced.exe bin\
+copy gui\CardinalC2-GUI.exe bin\
 
 echo [+] Installation complete!
 echo.
@@ -143,17 +143,17 @@ echo ============================================
 echo Build Summary
 echo ============================================
 echo.
-echo Client:  bin\moonlight-implant-enhanced.exe
-echo Server:  bin\moonlight-server-enhanced.exe
-echo GUI:     bin\MoonlightC2-GUI.exe
+echo Client:  bin\Cardinal-implant-enhanced.exe
+echo Server:  bin\Cardinal-server-enhanced.exe
+echo GUI:     bin\CardinalC2-GUI.exe
 echo.
 echo ============================================
 echo Build completed successfully!
 echo ============================================
 echo.
 echo Next steps:
-echo   1. Start server: bin\moonlight-server-enhanced.exe
-echo   2. Launch GUI:   bin\MoonlightC2-GUI.exe
+echo   1. Start server: bin\Cardinal-server-enhanced.exe
+echo   2. Launch GUI:   bin\CardinalC2-GUI.exe
 echo.
 pause
 exit /b 0

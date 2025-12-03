@@ -1,4 +1,4 @@
-# Moonlight C2 Framework - Master Build Script
+# Cardinal C2 Framework - Master Build Script
 # Builds all components: Client, Server, GUI, Exploits
 
 param(
@@ -13,7 +13,7 @@ param(
 $ErrorActionPreference = "Continue"
 
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "Moonlight C2 Framework - Build System v2.0" -ForegroundColor Cyan
+Write-Host "Cardinal C2 Framework - Build System v2.0" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -125,7 +125,7 @@ if ($buildAll -or $Client) {
     
     # Link
     Write-Host "[*] 링킹 중..." -ForegroundColor Yellow
-    gcc -m32 -o build\moonlight-implant-enhanced.exe `
+    gcc -m32 -o build\Cardinal-implant-enhanced.exe `
         build\obj\implant_enhanced.o `
         build\obj\monitoring_control.o `
         build\obj\stealth.obj `
@@ -136,9 +136,9 @@ if ($buildAll -or $Client) {
         -lws2_32 -ladvapi32 -lgdi32 -luser32 -s
     
     if ($LASTEXITCODE -eq 0) {
-        Copy-Item "build\moonlight-implant-enhanced.exe" "..\bin\" -Force
+        Copy-Item "build\Cardinal-implant-enhanced.exe" "..\bin\" -Force
         Write-Host "[+] 클라이언트 빌드 성공!" -ForegroundColor Green
-        Write-Host "    출력: bin\moonlight-implant-enhanced.exe" -ForegroundColor White
+        Write-Host "    출력: bin\Cardinal-implant-enhanced.exe" -ForegroundColor White
     } else {
         Write-Host "[!] 클라이언트 빌드 실패" -ForegroundColor Red
         $buildSuccess = $false
@@ -182,15 +182,15 @@ if ($buildAll -or $Server) {
     
     # Link
     Write-Host "[*] 링킹 중..." -ForegroundColor Yellow
-    gcc -m32 -o build\moonlight-server-enhanced.exe `
+    gcc -m32 -o build\Cardinal-server-enhanced.exe `
         build\obj\main_enhanced.o `
         build\obj\network_asm.obj `
         -lws2_32 -lpthread -s
     
     if ($LASTEXITCODE -eq 0) {
-        Copy-Item "build\moonlight-server-enhanced.exe" "..\bin\" -Force
+        Copy-Item "build\Cardinal-server-enhanced.exe" "..\bin\" -Force
         Write-Host "[+] 서버 빌드 성공!" -ForegroundColor Green
-        Write-Host "    출력: bin\moonlight-server-enhanced.exe" -ForegroundColor White
+        Write-Host "    출력: bin\Cardinal-server-enhanced.exe" -ForegroundColor White
     } else {
         Write-Host "[!] 서버 빌드 실패" -ForegroundColor Red
         $buildSuccess = $false
@@ -211,13 +211,13 @@ if ($buildAll -or $GUI) {
     
     Write-Host "[*] GUI 컴파일 중..." -ForegroundColor Yellow
     gcc -m32 -Wall -O2 -DWIN32 -D_WIN32_WINNT=0x0501 -mwindows `
-        main.c -o MoonlightC2-GUI.exe `
+        main.c -o CardinalC2-GUI.exe `
         -lcomctl32 -lws2_32 -lgdi32 -lcomdlg32 -s
     
     if ($LASTEXITCODE -eq 0) {
-        Copy-Item "MoonlightC2-GUI.exe" "..\bin\" -Force
+        Copy-Item "CardinalC2-GUI.exe" "..\bin\" -Force
         Write-Host "[+] GUI 빌드 성공!" -ForegroundColor Green
-        Write-Host "    출력: bin\MoonlightC2-GUI.exe" -ForegroundColor White
+        Write-Host "    출력: bin\CardinalC2-GUI.exe" -ForegroundColor White
     } else {
         Write-Host "[!] GUI 빌드 실패" -ForegroundColor Red
         $buildSuccess = $false
@@ -289,19 +289,19 @@ Write-Host "빌드 요약" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 
-if (Test-Path "bin\moonlight-implant-enhanced.exe") {
-    $size = (Get-Item "bin\moonlight-implant-enhanced.exe").Length / 1KB
-    Write-Host "[+] Client:  bin\moonlight-implant-enhanced.exe ($([math]::Round($size, 2)) KB)" -ForegroundColor Green
+if (Test-Path "bin\Cardinal-implant-enhanced.exe") {
+    $size = (Get-Item "bin\Cardinal-implant-enhanced.exe").Length / 1KB
+    Write-Host "[+] Client:  bin\Cardinal-implant-enhanced.exe ($([math]::Round($size, 2)) KB)" -ForegroundColor Green
 }
 
-if (Test-Path "bin\moonlight-server-enhanced.exe") {
-    $size = (Get-Item "bin\moonlight-server-enhanced.exe").Length / 1KB
-    Write-Host "[+] Server:  bin\moonlight-server-enhanced.exe ($([math]::Round($size, 2)) KB)" -ForegroundColor Green
+if (Test-Path "bin\Cardinal-server-enhanced.exe") {
+    $size = (Get-Item "bin\Cardinal-server-enhanced.exe").Length / 1KB
+    Write-Host "[+] Server:  bin\Cardinal-server-enhanced.exe ($([math]::Round($size, 2)) KB)" -ForegroundColor Green
 }
 
-if (Test-Path "bin\MoonlightC2-GUI.exe") {
-    $size = (Get-Item "bin\MoonlightC2-GUI.exe").Length / 1KB
-    Write-Host "[+] GUI:     bin\MoonlightC2-GUI.exe ($([math]::Round($size, 2)) KB)" -ForegroundColor Green
+if (Test-Path "bin\CardinalC2-GUI.exe") {
+    $size = (Get-Item "bin\CardinalC2-GUI.exe").Length / 1KB
+    Write-Host "[+] GUI:     bin\CardinalC2-GUI.exe ($([math]::Round($size, 2)) KB)" -ForegroundColor Green
 }
 
 if (Test-Path "bin\exploits") {
@@ -317,8 +317,8 @@ if ($buildSuccess) {
     Write-Host "============================================" -ForegroundColor Green
     Write-Host ""
     Write-Host "다음 단계:" -ForegroundColor Yellow
-    Write-Host "  1. 서버 시작: .\bin\moonlight-server-enhanced.exe" -ForegroundColor White
-    Write-Host "  2. GUI 실행: .\bin\MoonlightC2-GUI.exe" -ForegroundColor White
+    Write-Host "  1. 서버 시작: .\bin\Cardinal-server-enhanced.exe" -ForegroundColor White
+    Write-Host "  2. GUI 실행: .\bin\CardinalC2-GUI.exe" -ForegroundColor White
     Write-Host "  3. 문서 참조: README.md, COMMANDS.md" -ForegroundColor White
     Write-Host ""
 } else {
@@ -338,7 +338,7 @@ if ($Package) {
     Write-Host ""
     
     $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-    $releaseDir = "release\moonlight-c2-$timestamp"
+    $releaseDir = "release\Cardinal-c2-$timestamp"
     
     if (Test-Path "release") { Remove-Item "release" -Recurse -Force }
     New-Item -ItemType Directory -Path $releaseDir -Force | Out-Null
@@ -360,7 +360,7 @@ if ($Package) {
     }
     
     # Create archive
-    $zipFile = "release\moonlight-c2-$timestamp.zip"
+    $zipFile = "release\Cardinal-c2-$timestamp.zip"
     Compress-Archive -Path $releaseDir -DestinationPath $zipFile -Force
     
     Write-Host "[+] 릴리즈 패키지 생성 완료!" -ForegroundColor Green

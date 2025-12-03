@@ -1,4 +1,4 @@
-# Moonlight C2 Framework - Historical Commit Generator
+# Cardinal C2 Framework - Historical Commit Generator
 # Generates commits from 2013-02-08 to 2016-12-31 (10 commits per day)
 
 param(
@@ -17,7 +17,7 @@ $COMMITS_PER_DAY = 10
 $totalDays = ($END_DATE - $START_DATE).Days + 1
 $totalCommits = $totalDays * $COMMITS_PER_DAY
 
-Write-Host "`n=== Moonlight C2 Framework - Historical Commit Generator ===" -ForegroundColor Cyan
+Write-Host "`n=== Cardinal C2 Framework - Historical Commit Generator ===" -ForegroundColor Cyan
 Write-Host "Start Date: $($START_DATE.ToString('yyyy-MM-dd'))" -ForegroundColor White
 Write-Host "End Date: $($END_DATE.ToString('yyyy-MM-dd'))" -ForegroundColor White
 Write-Host "Total Days: $totalDays" -ForegroundColor White

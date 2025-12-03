@@ -1,10 +1,10 @@
-# Moonlight C2 Framework - Master Build Script
+# Cardinal C2 Framework - Master Build Script
 # PowerShell Build Automation
 
 $ErrorActionPreference = "Stop"
 
 Write-Host "`n=====================================" -ForegroundColor Cyan
-Write-Host "  Moonlight C2 Framework - Builder  " -ForegroundColor Cyan
+Write-Host "  Cardinal C2 Framework - Builder  " -ForegroundColor Cyan
 Write-Host "=====================================" -ForegroundColor Cyan
 Write-Host "For Authorized Penetration Testing Only`n" -ForegroundColor Yellow
 
@@ -59,10 +59,10 @@ Write-Host "`n[*] Building C2 Server..." -ForegroundColor Cyan
 Push-Location server
 try {
     if ($hasGCC) {
-        & gcc -Wall -O2 -DWIN32 -D_WIN32_WINNT=0x0500 main.c -o moonlight-server.exe -lws2_32
+        & gcc -Wall -O2 -DWIN32 -D_WIN32_WINNT=0x0500 main.c -o Cardinal-server.exe -lws2_32
         if ($LASTEXITCODE -eq 0) {
             Write-Host "[+] Server compiled successfully" -ForegroundColor Green
-            Copy-Item moonlight-server.exe ..\bin\ -Force
+            Copy-Item Cardinal-server.exe ..\bin\ -Force
         } else {
             Write-Host "[!] Server compilation failed" -ForegroundColor Red
         }
@@ -77,10 +77,10 @@ Write-Host "`n[*] Building C2 Client/Implant..." -ForegroundColor Cyan
 Push-Location client
 try {
     if ($hasGCC) {
-        & gcc -Wall -O2 -DWIN32 -D_WIN32_WINNT=0x0500 -mwindows implant.c -o moonlight-implant.exe -lws2_32 -ladvapi32 -luser32
+        & gcc -Wall -O2 -DWIN32 -D_WIN32_WINNT=0x0500 -mwindows implant.c -o Cardinal-implant.exe -lws2_32 -ladvapi32 -luser32
         if ($LASTEXITCODE -eq 0) {
             Write-Host "[+] Client compiled successfully" -ForegroundColor Green
-            Copy-Item moonlight-implant.exe ..\bin\ -Force
+            Copy-Item Cardinal-implant.exe ..\bin\ -Force
         } else {
             Write-Host "[!] Client compilation failed" -ForegroundColor Red
         }
@@ -131,14 +131,14 @@ Write-Host "`n[*] Building GUI Application..." -ForegroundColor Cyan
 Push-Location gui
 try {
     if ($hasDotnet) {
-        & dotnet build MoonlightC2.csproj -c Release -o ..\bin\gui
+        & dotnet build CardinalC2.csproj -c Release -o ..\bin\gui
         if ($LASTEXITCODE -eq 0) {
             Write-Host "[+] GUI compiled successfully" -ForegroundColor Green
         } else {
             Write-Host "[!] GUI compilation failed" -ForegroundColor Red
         }
     } elseif ($hasMSBuild) {
-        & msbuild MoonlightC2.csproj /p:Configuration=Release /p:OutputPath=..\bin\gui
+        & msbuild CardinalC2.csproj /p:Configuration=Release /p:OutputPath=..\bin\gui
         if ($LASTEXITCODE -eq 0) {
             Write-Host "[+] GUI compiled successfully" -ForegroundColor Green
         }

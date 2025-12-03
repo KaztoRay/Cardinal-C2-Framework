@@ -28,8 +28,8 @@ for ($date = $START; $date -le $END; $date = $date.AddDays(1)) {
         $stream += ""
         $stream += "commit refs/heads/master"
         $stream += "mark :$mark"
-        $stream += "author Developer <dev@moonlight.c2> $ts +0000"
-        $stream += "committer Developer <dev@moonlight.c2> $ts +0000"
+        $stream += "author Developer <dev@Cardinal.c2> $ts +0000"
+        $stream += "committer Developer <dev@Cardinal.c2> $ts +0000"
         $stream += "data " + $msg.Length
         $stream += $msg
         if ($commitNum -eq 1) {

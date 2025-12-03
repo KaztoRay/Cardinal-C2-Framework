@@ -1,10 +1,10 @@
 /*
- * Moonlight C2 Framework - 통합 헤더
+ * Cardinal C2 Framework - 통합 헤더
  * 모든 주요 기능의 함수 선언
  */
 
-#ifndef MOONLIGHT_H
-#define MOONLIGHT_H
+#ifndef Cardinal_H
+#define Cardinal_H
 
 #include <windows.h>
 #include <winsock2.h>

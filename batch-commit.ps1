@@ -1,7 +1,7 @@
 # Batch Commit Generator - 100 commits at once
 $ErrorActionPreference = "SilentlyContinue"
 
-Write-Host "[*] Moonlight C2 - Batch Commit Generator" -F Cyan
+Write-Host "[*] Cardinal C2 - Batch Commit Generator" -F Cyan
 
 if (Test-Path .git) { Remove-Item .git -Recurse -Force }
 git init | Out-Null
