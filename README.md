@@ -648,31 +648,6 @@ This project is released under an Educational License. See [LICENSE](LICENSE) fi
 - ❌ Production deployment without proper authorization
 
 ---
-
-## 🙏 Acknowledgments
-
-- Inspired by Cobalt Strike's interface design
-- Assembly techniques from malware research papers
-- Direct syscall implementation inspired by SysWhispers2
-- Built for security education and authorized testing
-- Thanks to the security research community
-
-### Technical References
-
-- **j00ru's Windows Syscall Tables**: Syscall number reference
-- **SysWhispers2**: Direct syscall generation
-- **al-khaser**: Anti-analysis techniques
-- **Pafish**: VM/Sandbox detection methods
-
-### Contributors
-
-- Assembly optimization (stealth, syscalls, networking)
-- CVE database expansion (71 CVEs)
-- Automated exploit generation system
-- GUI interface development
-
----
-
 ## 📖 Documentation
 
 - **[README.md](README.md)** - This file (overview and quick start)
