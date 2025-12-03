@@ -266,6 +266,9 @@ void ProcessCommand(int session_id, const char* command) {
 }
 
 void DisplayBanner() {
+    // UTF-8 콘솔 설정
+    SetConsoleOutputCP(65001);
+    
     printf("\n");
     printf("  ███╗   ███╗ ██████╗  ██████╗ ███╗   ██╗██╗     ██╗ ██████╗ ██╗  ██╗████████╗\n");
     printf("  ████╗ ████║██╔═══██╗██╔═══██╗████╗  ██║██║     ██║██╔════╝ ██║  ██║╚══██╔══╝\n");
@@ -274,17 +277,17 @@ void DisplayBanner() {
     printf("  ██║ ╚═╝ ██║╚██████╔╝╚██████╔╝██║ ╚████║███████╗██║╚██████╔╝██║  ██║   ██║   \n");
     printf("  ╚═╝     ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   \n");
     printf("\n");
-    printf("  Moonlight C2 Framework v1.0\n");
-    printf("  Legacy Windows Command & Control System\n");
-    printf("  For Authorized Penetration Testing Only\n");
+    printf("  Moonlight C2 Framework v3.0 (Pure C + GUI)\n");
+    printf("  레거시 Windows 명령 및 제어 시스템\n");
+    printf("  승인된 침투 테스트 전용\n");
     printf("\n");
 }
 
 void ServerConsole() {
     char command[512];
     
-    printf("\nMoonlight C2 Console\n");
-    printf("Type 'help' for available commands\n\n");
+    printf("\nMoonlight C2 콘솔\n");
+    printf("'help'를 입력하여 사용 가능한 명령어 확인\n\n");
     
     while (g_ServerRunning) {
         printf("moonlight> ");
@@ -300,13 +303,13 @@ void ServerConsole() {
         }
         
         if (strcmp(command, "help") == 0) {
-            printf("\nAvailable Commands:\n");
-            printf("  sessions         - List all active sessions\n");
-            printf("  interact <id>    - Interact with a session\n");
-            printf("  exec <id> <cmd>  - Execute command on session\n");
-            printf("  kill <id>        - Terminate a session\n");
-            printf("  broadcast <msg>  - Send message to all sessions\n");
-            printf("  exit             - Shutdown server\n\n");
+            printf("\n사용 가능한 명령어:\n");
+            printf("  sessions         - 모든 활성 세션 목록\n");
+            printf("  interact <id>    - 세션과 상호작용\n");
+            printf("  exec <id> <cmd>  - 세션에서 명령 실행\n");
+            printf("  kill <id>        - 세션 종료\n");
+            printf("  broadcast <msg>  - 모든 세션에 메시지 전송\n");
+            printf("  exit             - 서버 종료\n\n");
         }
         else if (strcmp(command, "sessions") == 0) {
             ListActiveSessions();
@@ -316,9 +319,9 @@ void ServerConsole() {
             char cmd[400];
             if (sscanf(command + 5, "%d %[^\n]", &session_id, cmd) == 2) {
                 ProcessCommand(session_id, cmd);
-                printf("[+] Command sent to session %d\n", session_id);
+                printf("[+] 세션 %d에 명령 전송됨\n", session_id);
             } else {
-                printf("[!] Usage: exec <session_id> <command>\n");
+                printf("[!] 사용법: exec <session_id> <command>\n");
             }
         }
         else if (strncmp(command, "kill ", 5) == 0) {
@@ -326,12 +329,12 @@ void ServerConsole() {
             RemoveClientSession(session_id);
         }
         else if (strcmp(command, "exit") == 0) {
-            printf("[*] Shutting down server...\n");
+            printf("[*] 서버 종료 중...\n");
             g_ServerRunning = FALSE;
             break;
         }
         else {
-            printf("[!] Unknown command. Type 'help' for available commands\n");
+            printf("[!] 알 수 없는 명령어입니다. 'help'를 입력하여 사용 가능한 명령어 확인\n");
         }
     }
 }
