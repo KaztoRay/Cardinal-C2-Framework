@@ -26,6 +26,76 @@
 static int cursor_x = 0;
 static int cursor_y = 0;
 
+// Virtual filesystem
+#define MAX_DIRS 100
+typedef struct {
+    char path[256];
+    int exists;
+} vfs_dir_t;
+
+static vfs_dir_t dirs[MAX_DIRS];
+static int dir_count = 0;
+static char current_dir[256] = "/root";
+
+void init_filesystem(void) {
+    const char* initial_dirs[] = {
+        "/", "/root", "/home", "/bin", "/boot", "/c2", "/dev", 
+        "/etc", "/exploit", "/lib", "/opt", "/tmp", "/usr", "/var",
+        "/usr/bin", "/usr/local", "/var/log", "/var/tmp",
+        "C:", "C:/WINDOWS", "C:/Users", "C:/Temp"
+    };
+    
+    dir_count = 0;
+    for (int i = 0; i < sizeof(initial_dirs) / sizeof(initial_dirs[0]); i++) {
+        strcpy(dirs[dir_count].path, initial_dirs[i]);
+        dirs[dir_count].exists = 1;
+        dir_count++;
+    }
+}
+
+int dir_exists(const char* path) {
+    for (int i = 0; i < dir_count; i++) {
+        if (strcmp(dirs[i].path, path) == 0 && dirs[i].exists) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void create_directory(const char* path) {
+    if (dir_count < MAX_DIRS) {
+        strcpy(dirs[dir_count].path, path);
+        dirs[dir_count].exists = 1;
+        dir_count++;
+    }
+}
+
+void list_directory(const char* path) {
+    int found = 0;
+    int len = strlen(path);
+    
+    for (int i = 0; i < dir_count; i++) {
+        if (!dirs[i].exists) continue;
+        
+        // Check if this dir is a child of the specified path
+        if (strncmp(dirs[i].path, path, len) == 0) {
+            const char* remainder = dirs[i].path + len;
+            if (*remainder == '/' || (len == 1 && path[0] == '/')) {
+                if (*remainder == '/') remainder++;
+                
+                // Only show direct children (no additional slashes)
+                const char* slash = strchr(remainder, '/');
+                if (slash == NULL && strlen(remainder) > 0) {
+                    printf("\033[94m%s/\033[0m  ", remainder);
+                    found = 1;
+                }
+            }
+        }
+    }
+    
+    if (found) printf("\n");
+}
+
 void kernel_clear_screen(void) {
     system("cls");
     cursor_x = 0;
@@ -445,25 +515,83 @@ void show_help(void) {
 }
 
 void handle_command(char* cmd) {
-    if (strcmp(cmd, "help") == 0) {
+    // Parse command and arguments
+    char* args[10] = {0};
+    int argc = 0;
+    char* token = strtok(cmd, " ");
+    
+    while (token != NULL && argc < 10) {
+        args[argc++] = token;
+        token = strtok(NULL, " ");
+    }
+    
+    if (argc == 0) return;
+    
+    // Command routing
+    if (strcmp(args[0], "ls") == 0 || strcmp(args[0], "dir") == 0) {
+        const char* target = argc > 1 ? args[1] : current_dir;
+        list_directory(target);
+        
+    } else if (strcmp(args[0], "cd") == 0) {
+        if (argc < 2) {
+            printf("cd: missing directory argument\n");
+            return;
+        }
+        
+        char new_path[256];
+        if (args[1][0] == '/') {
+            strcpy(new_path, args[1]);
+        } else {
+            snprintf(new_path, sizeof(new_path), "%s/%s", current_dir, args[1]);
+        }
+        
+        if (dir_exists(new_path)) {
+            strcpy(current_dir, new_path);
+        } else {
+            printf("\033[91mcd: %s: No such file or directory\033[0m\n", args[1]);
+        }
+        
+    } else if (strcmp(args[0], "mkdir") == 0) {
+        if (argc < 2) {
+            printf("mkdir: missing directory name\n");
+            return;
+        }
+        
+        char new_path[256];
+        if (args[1][0] == '/') {
+            strcpy(new_path, args[1]);
+        } else {
+            snprintf(new_path, sizeof(new_path), "%s/%s", current_dir, args[1]);
+        }
+        
+        if (dir_exists(new_path)) {
+            printf("\033[91mmkdir: cannot create directory '%s': File exists\033[0m\n", args[1]);
+        } else {
+            create_directory(new_path);
+            printf("\033[92m[OK]\033[0m Directory created: %s\n", new_path);
+        }
+        
+    } else if (strcmp(args[0], "pwd") == 0) {
+        printf("%s\n", current_dir);
+        
+    } else if (strcmp(args[0], "help") == 0) {
         show_help();
-    } else if (strcmp(cmd, "clear") == 0) {
+    } else if (strcmp(args[0], "clear") == 0) {
+    } else if (strcmp(args[0], "clear") == 0) {
         kernel_clear_screen();
         print_banner();
-    } else if (strcmp(cmd, "exit") == 0) {
+    } else if (strcmp(args[0], "exit") == 0) {
         kernel_print("Exiting CardinalOS...\n");
         exit(0);
-    } else if (strcmp(cmd, "pwd") == 0) {
-        kernel_print("/root\n");
-    } else if (strcmp(cmd, "uname") == 0) {
-        kernel_print("CardinalOS 2.0.0-redteam x86_64\n");
-    } else if (strcmp(cmd, "hostname") == 0) {
+    } else if (strcmp(args[0], "uname") == 0) {
+        kernel_print("CardinalOS 3.0.0-unified x86_64\n");
+    } else if (strcmp(args[0], "hostname") == 0) {
         kernel_print("cardinalos-redteam\n");
-    } else if (strcmp(cmd, "free") == 0) {
+    } else if (strcmp(args[0], "free") == 0) {
         kernel_print("              total        used        free      shared  buff/cache   available\n");
         kernel_print("Mem:      134217728    45088768    89128960           0           0    89128960\n");
         kernel_print("Swap:             0           0           0\n");
-    } else if (strcmp(cmd, "ps") == 0) {
+    } else if (strcmp(args[0], "ps") == 0) {
         kernel_print("  PID  PPID  CPU  MEM  CMD\n");
         kernel_print("    1     0    0    1  init\n");
         kernel_print("    2     1    0    2  kthreadd\n");
@@ -473,14 +601,14 @@ void handle_command(char* cmd) {
         kernel_print("   11     1    0    2  exploit-daemon\n");
         kernel_print("   12     1    0    1  stealth-agent\n");
         kernel_print("  100     1    2    4  cardinalos-shell\n");
-    } else if (strcmp(cmd, "top") == 0) {
+    } else if (strcmp(args[0], "top") == 0) {
         kernel_print("Tasks: 12 total,   1 running,  11 sleeping\n");
         kernel_print("CPU:  2.1%us,  1.3%sy,  0.0%ni, 96.6%id\n");
         kernel_print("Mem: 128MB total, 45MB used, 83MB free\n");
         kernel_print("\n  PID USER     PR  NI  VIRT  RES  SHR S  %CPU %MEM     TIME+ COMMAND\n");
         kernel_print("  100 root     20   0  8192 4096 2048 R   2.1  3.2   0:05.23 shell\n");
         kernel_print("   10 root     20   0 12288 6144 3072 S   1.3  4.8   0:12.45 c2-server\n");
-    } else if (strcmp(cmd, "c2-status") == 0) {
+    } else if (strcmp(args[0], "c2-status") == 0) {
         printf("\033[91m");
         kernel_print("\n╔════════════════════════════════════════════════════════════╗\n");
         kernel_print("║              C2 SERVER STATUS REPORT                       ║\n");
@@ -500,7 +628,7 @@ void handle_command(char* cmd) {
         kernel_print("  [*] Uptime:            0d 0h 5m 23s\n");
         kernel_print("  [*] Bandwidth Used:     0 MB\n");
         kernel_print("\n");
-    } else if (strcmp(cmd, "c2-sessions") == 0) {
+    } else if (strcmp(args[0], "c2-sessions") == 0) {
         kernel_print("\n╔════════════════════════════════════════════════════════════════════════╗\n");
         kernel_print("║                     ACTIVE C2 SESSIONS                                 ║\n");
         kernel_print("╚════════════════════════════════════════════════════════════════════════╝\n");
@@ -508,7 +636,7 @@ void handle_command(char* cmd) {
         kernel_print("-----+-----------------+-----------------+-------------+---------------+----------\n");
         kernel_print(" No active sessions\n\n");
         kernel_print(" Use 'c2-interact <id>' to interact with a session\n\n");
-    } else if (strncmp(cmd, "c2-exploit", 10) == 0) {
+    } else if (strncmp(args[0], "c2-exploit", 10) == 0) {
         printf("\033[95m");
         kernel_print("\n╔════════════════════════════════════════════════════════════╗\n");
         kernel_print("║              EXPLOIT FRAMEWORK                             ║\n");
@@ -525,11 +653,11 @@ void handle_command(char* cmd) {
         kernel_print("  [8] heartbleed    OpenSSL - CVE-2014-0160\n");
         kernel_print("\nUsage: c2-exploit <name> <target_ip>\n");
         kernel_print("Example: c2-exploit ms17-010 192.168.1.100\n\n");
-    } else if (strcmp(cmd, "exploit-list") == 0) {
+    } else if (strcmp(args[0], "exploit-list") == 0) {
         kernel_print("\nTotal exploits: 150+\n");
         kernel_print("Categories: Windows (85), Linux (45), Web (20+)\n\n");
         kernel_print("Use 'exploit-search <keyword>' to find specific exploits\n\n");
-    } else if (strcmp(cmd, "nmap") == 0 || strcmp(cmd, "portscan") == 0) {
+    } else if (strcmp(args[0], "nmap") == 0 || strcmp(args[0], "portscan") == 0) {
         kernel_print("\nUsage: nmap <target> [options]\n");
         kernel_print("Options:\n");
         kernel_print("  -sS    SYN scan (stealth)\n");
@@ -538,56 +666,56 @@ void handle_command(char* cmd) {
         kernel_print("  -A     Aggressive scan\n");
         kernel_print("  -p-    Scan all ports\n");
         kernel_print("\nExample: nmap -sS -A 192.168.1.0/24\n\n");
-    } else if (strcmp(cmd, "vulnscan") == 0) {
+    } else if (strcmp(args[0], "vulnscan") == 0) {
         kernel_print("\nVulnerability Scanner Ready\n");
         kernel_print("Usage: vulnscan <target>\n");
         kernel_print("Example: vulnscan 192.168.1.100\n\n");
-    } else if (strcmp(cmd, "sniff") == 0 || strcmp(cmd, "tcpdump") == 0) {
+    } else if (strcmp(args[0], "sniff") == 0 || strcmp(args[0], "tcpdump") == 0) {
         kernel_print("\nPacket Sniffer\n");
         kernel_print("Usage: sniff <interface> [filter]\n");
         kernel_print("Example: sniff eth0 'tcp port 80'\n\n");
-    } else if (strcmp(cmd, "arpspoof") == 0) {
+    } else if (strcmp(args[0], "arpspoof") == 0) {
         kernel_print("\nARP Spoofing Tool\n");
         kernel_print("Usage: arpspoof <target_ip> <gateway_ip> <interface>\n");
         kernel_print("Example: arpspoof 192.168.1.100 192.168.1.1 eth0\n\n");
-    } else if (strcmp(cmd, "dnsspoof") == 0) {
+    } else if (strcmp(args[0], "dnsspoof") == 0) {
         kernel_print("\nDNS Spoofing Tool\n");
         kernel_print("Usage: dnsspoof <domain> <fake_ip> <interface>\n");
         kernel_print("Example: dnsspoof example.com 1.2.3.4 eth0\n\n");
-    } else if (strcmp(cmd, "sslstrip") == 0) {
+    } else if (strcmp(args[0], "sslstrip") == 0) {
         kernel_print("\nSSL/TLS Stripping Tool\n");
         kernel_print("Usage: sslstrip <interface>\n");
         kernel_print("Example: sslstrip eth0\n\n");
-    } else if (strcmp(cmd, "dump-creds") == 0) {
+    } else if (strcmp(args[0], "dump-creds") == 0) {
         kernel_print("\nCredential Dumper\n");
         kernel_print("[*] Searching for credentials...\n");
         kernel_print("[+] Found 0 credentials\n\n");
-    } else if (strcmp(cmd, "mimikatz") == 0) {
+    } else if (strcmp(args[0], "mimikatz") == 0) {
         kernel_print("\nMimikatz - Windows Credential Dumper\n");
         kernel_print("Usage: mimikatz <command>\n");
         kernel_print("Commands: sekurlsa::logonpasswords, lsadump::sam\n\n");
-    } else if (strcmp(cmd, "keylog-start") == 0) {
+    } else if (strcmp(args[0], "keylog-start") == 0) {
         printf("\033[92m");
         kernel_print("[+] Keylogger started successfully\n");
         printf("\033[0m");
         kernel_print("[*] Logging to: /var/log/keylog.txt\n\n");
-    } else if (strcmp(cmd, "screenshot") == 0) {
+    } else if (strcmp(args[0], "screenshot") == 0) {
         kernel_print("[*] Taking screenshot...\n");
         kernel_print("[+] Screenshot saved to: /tmp/screen_001.png\n\n");
-    } else if (strcmp(cmd, "stealth-on") == 0) {
+    } else if (strcmp(args[0], "stealth-on") == 0) {
         printf("\033[92m");
         kernel_print("[+] Stealth mode activated\n");
         printf("\033[0m");
         kernel_print("[*] Process hidden from ps\n");
         kernel_print("[*] Network connections hidden from netstat\n");
         kernel_print("[*] Files hidden from ls\n\n");
-    } else if (strcmp(cmd, "anti-forensics") == 0) {
+    } else if (strcmp(args[0], "anti-forensics") == 0) {
         kernel_print("[*] Running anti-forensics measures...\n");
         kernel_print("[+] Timestamps modified\n");
         kernel_print("[+] Logs cleared\n");
         kernel_print("[+] Memory scrubbed\n");
         kernel_print("[+] Artifacts removed\n\n");
-    } else if (strcmp(cmd, "rootkit-install") == 0) {
+    } else if (strcmp(args[0], "rootkit-install") == 0) {
         printf("\033[91m");
         kernel_print("[WARNING] Installing kernel rootkit...\n");
         printf("\033[0m");
@@ -595,34 +723,34 @@ void handle_command(char* cmd) {
         kernel_print("[+] Rootkit installed successfully\n");
         kernel_print("[*] Kernel version spoofed\n");
         kernel_print("[*] System calls hooked\n\n");
-    } else if (strcmp(cmd, "ls") == 0) {
+    } else if (strcmp(args[0], "ls") == 0) {
         kernel_print("bin/  boot/  c2/  dev/  etc/  exploit/  home/  lib/  opt/  root/  tmp/  usr/  var/\n");
-    } else if (strcmp(cmd, "ifconfig") == 0) {
+    } else if (strcmp(args[0], "ifconfig") == 0) {
         kernel_print("eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500\n");
         kernel_print("        inet 192.168.1.100  netmask 255.255.255.0  broadcast 192.168.1.255\n");
         kernel_print("        inet6 fe80::a00:27ff:fe4e:66a1  prefixlen 64  scopeid 0x20<link>\n");
         kernel_print("        ether 08:00:27:4e:66:a1  txqueuelen 1000  (Ethernet)\n");
-    } else if (strcmp(cmd, "netstat") == 0) {
+    } else if (strcmp(args[0], "netstat") == 0) {
         kernel_print("Active Internet connections\n");
         kernel_print("Proto Recv-Q Send-Q Local Address           Foreign Address         State\n");
         kernel_print("tcp        0      0 0.0.0.0:4444            0.0.0.0:*               LISTEN\n");
         kernel_print("tcp        0      0 0.0.0.0:443             0.0.0.0:*               LISTEN\n");
         kernel_print("udp        0      0 0.0.0.0:53              0.0.0.0:*               \n");
-    } else if (strcmp(cmd, "dmesg") == 0) {
+    } else if (strcmp(args[0], "dmesg") == 0) {
         kernel_print("[    0.000000] Initializing CardinalOS kernel\n");
         kernel_print("[    0.001234] CPU: Intel Core x86_64 detected\n");
         kernel_print("[    0.002456] Memory: 128MB available\n");
         kernel_print("[    0.003678] C2 framework loaded\n");
         kernel_print("[    0.004890] Exploit database initialized\n");
-    } else if (strcmp(cmd, "reboot") == 0) {
+    } else if (strcmp(args[0], "reboot") == 0) {
         kernel_print("\nRebooting system...\n\n");
         sleep_ms(1000);
         exit(0);
-    } else if (strcmp(cmd, "shutdown") == 0) {
+    } else if (strcmp(args[0], "shutdown") == 0) {
         kernel_print("\nShutting down system...\n\n");
         sleep_ms(1000);
         exit(0);
-    } else if (strcmp(cmd, "") == 0) {
+    } else if (strcmp(args[0], "") == 0) {
         // Empty command, do nothing
     } else {
         printf("\033[91m");
@@ -638,7 +766,7 @@ void shell_run(void) {
     kernel_print("Starting CardinalOS shell...\n\n");
     
     while (1) {
-        // Print prompt
+        // Print prompt with dynamic current directory
         printf("\033[92m");  // Green
         printf("root");
         printf("\033[0m");
@@ -648,7 +776,7 @@ void shell_run(void) {
         printf("\033[0m");
         printf(":");
         printf("\033[94m");  // Blue
-        printf("/root");
+        printf("%s", current_dir);
         printf("\033[0m");
         printf("# ");
         
@@ -679,6 +807,9 @@ int main(void) {
     GetConsoleMode(hOut, &dwMode);
     dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
     SetConsoleMode(hOut, dwMode);
+    
+    // Initialize filesystem
+    init_filesystem();
     
     // Print boot banner
     print_banner();
